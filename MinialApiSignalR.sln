@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinialApiSignalR", "MinialApiSignalR.csproj", "{F49EAAED-CF18-482D-B696-49D692F9BA1D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F49EAAED-CF18-482D-B696-49D692F9BA1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F49EAAED-CF18-482D-B696-49D692F9BA1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F49EAAED-CF18-482D-B696-49D692F9BA1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F49EAAED-CF18-482D-B696-49D692F9BA1D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {225FCC50-39BA-4E74-B02E-CC4C983F6570}
+	EndGlobalSection
+EndGlobal
