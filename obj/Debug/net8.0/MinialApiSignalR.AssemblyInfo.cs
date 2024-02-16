@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MinialApiSignalR")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7b9fa9572dae2b01b5277eb924f817a78149dbc")]
 [assembly: System.Reflection.AssemblyProductAttribute("MinialApiSignalR")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MinialApiSignalR")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

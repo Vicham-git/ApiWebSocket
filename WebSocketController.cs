@@ -8,14 +8,16 @@ using System.Text;
 [Route("api/[controller]")]
 public class WebSocketController : ControllerBase
 {
-    private static readonly ConcurrentBag<WebSocket> _sockets = new ConcurrentBag<WebSocket>();
-    [HttpGet("ws")]
-    public async Task Get()
+    private static readonly ConcurrentDictionary<string, ConcurrentBag<WebSocket>> _groupSockets = new ConcurrentDictionary<string, ConcurrentBag<WebSocket>>();
+
+    [HttpGet("ws/{ITE}")]
+    public async Task Get(string ITE)
     {
         if (HttpContext.WebSockets.IsWebSocketRequest)
         {
             var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            _sockets.Add(webSocket);
+            AddToGroup(ITE, webSocket);
+
             await HandleWebSocket(HttpContext, webSocket);
         }
         else
@@ -24,18 +26,22 @@ public class WebSocketController : ControllerBase
         }
     }
 
-
-    [HttpGet("test")]
-    public async Task Test(string message)
+    private void AddToGroup(string ITE, WebSocket webSocket)
     {
-        if (HttpContext.WebSockets.IsWebSocketRequest)
+        var groupList = _groupSockets.GetOrAdd(ITE, new ConcurrentBag<WebSocket>());
+        groupList.Add(webSocket);
+    }
+
+    private void RemoveFromGroup(string ITE, WebSocket webSocket)
+    {
+        if (_groupSockets.TryGetValue(ITE, out var groupList))
         {
-            var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            await HandleWebSocket(HttpContext, webSocket);
-        }
-        else
-        {
-            HttpContext.Response.StatusCode = 400;
+            groupList.TryTake(out _);
+
+            if (groupList.IsEmpty)
+            {
+                _groupSockets.TryRemove(ITE, out _);
+            }
         }
     }
 
@@ -52,32 +58,34 @@ public class WebSocketController : ControllerBase
                 if (result.MessageType == WebSocketMessageType.Text)
                 {
                     var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    BroadcastMessage(message);
+                    BroadcastMessage(context.Request.RouteValues["ITE"].ToString(), message);
                 }
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    _sockets.TryTake(out _);
+                    RemoveFromGroup(context.Request.RouteValues["ITE"].ToString(), webSocket);
                     break;
                 }
             }
         }
         catch (Exception ex)
         {
-            // Log or handle the exception
             Console.WriteLine($"Error in HandleWebSocket: {ex.Message}");
-            _sockets.TryTake(out _);
+            RemoveFromGroup(context.Request.RouteValues["ITE"].ToString(), webSocket);
         }
     }
 
-    private async void BroadcastMessage(string message)
+    private async void BroadcastMessage(string ITE, string message)
     {
         var buffer = Encoding.UTF8.GetBytes(message);
 
-        foreach (var socket in _sockets)
+        if (_groupSockets.TryGetValue(ITE, out var groupList))
         {
-            if (socket.State == WebSocketState.Open)
+            foreach (var socket in groupList)
             {
-                await socket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                if (socket.State == WebSocketState.Open)
+                {
+                    await socket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                }
             }
         }
     }
